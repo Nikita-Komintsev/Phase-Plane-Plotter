@@ -1,5 +1,3 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<!-- saved from url=(0042)https://aeb019.hosted.uark.edu/pplane.html -->
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Phase portrait</title>
 <style type="text/css">
@@ -12,40 +10,19 @@ canvas{background-color: #ffffff;}
 </head>
 <body onload="initializeCanvas()">
 
-<!--TODO:
-Add the code to autofill forms based on URL
-Add two more graphs to pplane.html
--->
-
-<!--Form fields and other displayed things-->
-
-
 <table><tbody><tr><td>
 
-<nobr>dx/dt=<input id="xprime_id" size="60" type="text" value="y"></nobr>
+<!-- <nobr>dx/dt=<input id="xprime_id" size="60" type="text" value="y"></nobr> -->
 
 <br>
+<!-- <nobr>dy/dt=<input id="yprime_id" size="60" type="text" value="-2*0.1*y-x"></nobr> -->
+<nobr>ω = <input id="omega_id" size="30" type="text" value="1"></nobr>
+<br>
 
-<nobr>dy/dt=<input id="yprime_id" size="60" type="text" value="-2*0.1*y-x"></nobr>
-
-<!--+t/((x-2)^6+(y+2)^6+1)-->
+<nobr>σ = <input id="sigma_id" size="30" type="text" value="0.1"></nobr>
 
 </td>
 <td></td></tr></tbody></table>
-
-<!--Used to test the parseCaret function while writing it-->
-<!--
-test=<input id='test' size=60 type = "text" value="3+x^2-5+2^7+3^8"> 
-<button onClick='userSubmit()'>Test string</button>
-<P><div id='printtest'></div></p>
-<script type='text/javascript'>
-function userSubmit() {
-	var testinput=document.getElementById('test').value;
-	var testoutput = parseCaret(testinput);
-	document.getElementById('printtest').innerHTML='test: '+testoutput;
-}
-</script>
--->
 
 
 <hr style="width:90%">
@@ -55,7 +32,7 @@ The Display:
 <tbody><tr>
 <td>X <input id="xmin_id" size="5" value="-10"></td>
 <td> <input id="xmax_id" size="5" value="10"> </td>
-<td>Minimum&nbsp;t: </td><td> <input id="tmin_id" size="5" value="-8"> &nbsp;&nbsp;&nbsp; </td>
+<td>Minimum&nbsp;t: </td><td> <input id="tmin_id" size="5" value="0"> &nbsp;&nbsp;&nbsp; </td>
 <td>Arrow length: </td><td> <input id="arrow_id" size="5" value="10"> &nbsp;<button onclick="longerArrows()">+</button> &nbsp;<button onclick="shorterArrows()">-</button></td>
 </tr>
 <tr>
@@ -75,17 +52,14 @@ The Display:
 <td align="center" colspan="4"> &nbsp;
 </td>
 <td>Initial&nbsp;t: </td><td> <input id="tO_id" size="5" value="0">
-</td><td colspan="2"> <button onclick="plusT()">+</button>&nbsp;<button onclick="minusT()">-</button>&nbsp; 
-<!-- <button onclick="zoomInT()">Shorter path</button> &nbsp;
-<button onclick="zoomOutT()">Longer path</button> &nbsp; -->
 </td>
 <!-- <td><input type="checkbox" id="initialPosition" checked="">Show initial position</td> -->
 </tr>
 <tr><td colspan="4" align="center">
 <button onclick="draw()">Draw Phase Portrait</button></td>
-<td>Line width: </td><td> <input id="linewidth_id" size="5" value="2"></td>
-<td colspan="3"><button onclick="pluslinewidth()">+</button>&nbsp;<button onclick="minuslinewidth()">-</button>
-Initial x <input id="xO_id" size="5" value="0"> and y <input id="yO_id" size="5" value="4"> <button onclick="traceFromNumbers()">Trace path</button> (or click on the graph)
+
+<td>
+Initial x </td><td><input id="xO_id" size="5" value="-4"> and y <input id="yO_id" size="5" value="0"> <button onclick="traceFromNumbers()">Trace path</button> (or click on the graph)
 </td>
 </tr>
 </tbody></table>
@@ -115,8 +89,10 @@ Initial x <input id="xO_id" size="5" value="0"> and y <input id="yO_id" size="5"
 <script type="text/javascript">
 	// Define x', y'
 	function setDerivatives(){
-		yprimeString = parseFunction(document.getElementById('yprime_id').value);
-		xprimeString = parseFunction(document.getElementById('xprime_id').value);
+		omegaString = document.getElementById('omega_id').value;
+		sigmaString = document.getElementById('sigma_id').value;
+		yprimeString = parseFunction('-2*'+sigmaString+'*y-'+Math.pow(omegaString,2)+'*x');
+		xprimeString = parseFunction('y');
 		try  {
 			eval("yprime = function (x,y,t) { with(Math) {return " + yprimeString + ";}}");
 		} catch (e) {
@@ -128,9 +104,6 @@ Initial x <input id="xO_id" size="5" value="0"> and y <input id="yO_id" size="5"
 			alert(e); throw(e);
 		}
 	}
-
-
-// Security hole: don't parse arbitrary JavaScript
 
 var parseFunction = function(S){
 	var carets;
@@ -180,61 +153,6 @@ var parseFunction = function(S){
 	
 	
 	return output;
-}
-
-function zoomIn ()  {
-	xmin=document.getElementById('xmin_id').value;
-	xmax=document.getElementById('xmax_id').value;
-	ymin=document.getElementById('ymin_id').value;
-	ymax=document.getElementById('ymax_id').value;
-
-	xmid = 0.5*xmin+0.5*xmax;
-	ymid = 0.5*ymin+0.5*ymax;
-
-	document.getElementById('xmin_id').value = Math.floor(xmid-0.65*(xmid-xmin));
-	document.getElementById('xmax_id').value = Math.ceil(xmid+0.65*(xmid-xmin));
-	document.getElementById('ymin_id').value = Math.floor(ymid-0.65*(ymid-ymin));
-	document.getElementById('ymax_id').value = Math.ceil(ymid+0.65*(ymid-ymin));
-
-	xmin=document.getElementById('xmin_id').value;
-	xmax=document.getElementById('xmax_id').value;
-	ymin=document.getElementById('ymin_id').value;
-	ymax=document.getElementById('ymax_id').value;
-
-	draw();
-
-}
-
-function plusT ()  {
-	tO=document.getElementById('tO_id').value;
-	document.getElementById('tO_id').value = 1.0*tO+1;
-	tO=document.getElementById('tO_id').value;
-}
-
-function minusT ()  {
-	tO=document.getElementById('tO_id').value;
-	document.getElementById('tO_id').value = 1.0*tO-1;
-	tO=document.getElementById('tO_id').value;
-}
-
-function pluslinewidth ()  {
-	linewidth=document.getElementById('linewidth_id').value;
-	if(linewidth > 1) {
-		document.getElementById('linewidth_id').value = Math.round(1.0*linewidth+1);
-	} else {
-		document.getElementById('linewidth_id').value = 1.41421356*linewidth;
-	}
-	linewidth=document.getElementById('linewidth_id').value;
-}
-
-function minuslinewidth ()  {
-	linewidth=document.getElementById('linewidth_id').value;
-	if(linewidth > 1) {
-		document.getElementById('linewidth_id').value = Math.round(1.0*linewidth-1);
-	} else {
-		document.getElementById('linewidth_id').value = 0.70710678*linewidth;
-	}
-	linewidth=document.getElementById('linewidth_id').value;
 }
 
 function longerArrows ()  {
@@ -287,52 +205,6 @@ function resetArrows ()  {
 	draw();
 }
 
-function zoomOut ()  {
-	xmin=document.getElementById('xmin_id').value;
-	xmax=document.getElementById('xmax_id').value;
-	ymin=document.getElementById('ymin_id').value;
-	ymax=document.getElementById('ymax_id').value;
-
-	xmid = 0.5*xmin+0.5*xmax;
-	ymid = 0.5*ymin+0.5*ymax;
-
-	document.getElementById('xmin_id').value = Math.floor(1.0*xmid-1.2*(xmid-xmin));
-	document.getElementById('xmax_id').value = Math.ceil(1.0*xmid+1.2*(xmax-xmid));
-	document.getElementById('ymin_id').value = Math.floor(1.0*ymid-1.2*(ymid-ymin));
-	document.getElementById('ymax_id').value = Math.ceil(1.0*ymid+1.2*(ymax-ymid));
-
-	xmin=document.getElementById('xmin_id').value;
-	xmax=document.getElementById('xmax_id').value;
-	ymin=document.getElementById('ymin_id').value;
-	ymax=document.getElementById('ymax_id').value;
-
-	draw();
-}
-
-function zoomOutT ()  {
-	tmin=document.getElementById('tmin_id').value;
-	tmax=document.getElementById('tmax_id').value;
-	tO=document.getElementById('tO_id').value;
-
-	document.getElementById('tmin_id').value = Math.floor(1.0*tO-2*(1.0*tO-1.0*tmin));
-	document.getElementById('tmax_id').value = Math.ceil(1.0*tO+2*(1.0*tmax-1.0*tO));
-
-	tmin=document.getElementById('tmin_id').value;
-	tmax=document.getElementById('tmax_id').value;
-}
-function zoomInT ()  {
-	tmin=document.getElementById('tmin_id').value;
-	tmax=document.getElementById('tmax_id').value;
-	tO=document.getElementById('tO_id').value;
-
-	document.getElementById('tmin_id').value = Math.floor(1.0*tO-0.5*(1.0*tO-1.0*tmin));
-	document.getElementById('tmax_id').value = Math.ceil(1.0*tO+0.5*(1.0*tmax-1.0*tO));
-
-	tmin=document.getElementById('tmin_id').value;
-	tmax=document.getElementById('tmax_id').value;
-}
-
-
 function allowablechar(x){
 		if (x === "."){return true;}
 		else if (x === ","){return true;}
@@ -357,7 +229,6 @@ function allowablechar(x){
 		else{return false;}
 }
 
-// Some functions Math doesn't know
 var csc = function(x) { return 1.0/Math.sin(x)};
 var sec = function(x) { return 1.0/Math.cos(x)};
 var cot = function(x) { return (1.0/Math.tan(x))};
@@ -366,9 +237,6 @@ var asec = function(x) { return Math.acos(1.0/x)};
 var acot = function(x) { return Math.atan(1.0/x)};
 var u = function(x) { if(x<0){ return 0} else{return 1}};
 
-// Teaching Javascript what ^ means is hard
-// so we instead scan through the string and replace it with
-// Math.pow( , )
 var parseCaret = function(S){
 	var caretPosition = 0;
 	for(i=1; i<S.length; i++){
@@ -459,7 +327,6 @@ var arrow;
 var linewidth;
 var xstepsize, ystepsize;
 
-const mycolors = ["rgba(100,100,100)","brown","orange","red","purple","blue","rgba(0, 155, 255, 1)","green","black"];
 var steps;
 
 var isBlank; isBlank = true;
@@ -475,7 +342,7 @@ function draw() {
 	tmax=document.getElementById('tmax_id').value;
 	ymin=document.getElementById('ymin_id').value;
 	ymax=document.getElementById('ymax_id').value;
-	tO=document.getElementById('tO_id').value;
+	tO=0;
 	arrow=document.getElementById('arrow_id').value;
 	
 	var xAxis = document.getElementById("xAxisCanvas");
@@ -510,7 +377,7 @@ function draw() {
 
 	// Draw some grid lines
 	context.lineWidth = 1;
-	context.strokeStyle="rgba(192, 192, 255, 1)"; // light blue lines
+	context.strokeStyle="rgba(255, 255, 255, 0.9)"; // light blue lines
     context.beginPath();
     xCtx.textAlign="center";
     yCtx.textAlign="end";
@@ -543,7 +410,7 @@ function draw() {
 	context.stroke();
 		
 	// Draw the x-axis, y-axis
-	context.strokeStyle="blue"; // blue lines
+	context.strokeStyle="black";
 	context.beginPath();
 	context.moveTo(x0,0);
 	context.lineTo(x0,canvas.height);
@@ -552,20 +419,16 @@ function draw() {
 	context.stroke();
 
 
-	context.strokeStyle="black"; // black lines
+	context.strokeStyle="black";
 	context.beginPath();
 	
 	var dx, dy;
 	var arrowheaddx,arrowheaddy;
-
-	// The next line helps in debugging the function parser
-	// context.fillText(yprimeString,canvas.width/2,canvas.height/2);
 	
 	// Draw the direction field
 	var t;
 	for (tstep=0; tstep <=tstepcount; tstep = tstep+1) {
- 		if (tstep < tstepcount ) { context.strokeStyle = mycolors[tstep]; }
- 		else { context.strokeStyle="black"; }
+ 		context.strokeStyle="black";
  		t = 1.0*tO;
 		if (tstepcount > 0 ) { t = 1.0*tmin+tstep*(1.0*tmax-1.0*tmin)/(1.0*tstepcount); }
 		context.beginPath();
@@ -616,20 +479,13 @@ function draw() {
 						y0-y*yscale - dy/2 + arrowheaddy - 0.5*arrowheaddx);		
 					context.stroke();
  				}		
-  				y = y+ystep;
-				//context.fillRect(x0+x*xscale, y0-y*yscale,10,10);
+  				y = y+ystep;;
 			}
  			x = x+xstep;
  		}
 	}
-	//context.fillRect(0,0,10,10); // For debugging purposes only
-	//if (document.getElementById("manyArrows").checked && tstepcount == 0)
-	//{ draw(); }
+
 }
-
-
-
-// Trace Runge-Kutta approximations to solutions on mouse click
 
 canvas.addEventListener('mousedown', function(evt) {
 	var mousePos = getMousePos(canvas, evt);
@@ -654,17 +510,6 @@ function traceFromNumbers () {
 	yO=document.getElementById('yO_id').value *(-1.0)*yscale+y0;
 	doMouseDown(canvas,xO,yO);
 }
-
-var whichcolor;
-function setColor (T) {
-	whichcolor = Math.round ((T-1.0*tmin)*tstepcount/(1.0*tmax-1.0*tmin));
-	if(whichcolor >= tstepcount+1) {whichcolor = tstepcount;}
-	if(whichcolor < 0) {whichcolor = 0;}
-	if(tstepcount > 0){ 
-	context.strokeStyle = mycolors[whichcolor];
-	context.fillStyle = mycolors[whichcolor];
-	}
-}
 	
 var doMouseDown=function(canvas, xcoord, ycoord){
 	tstepcount = 0;
@@ -674,17 +519,17 @@ var doMouseDown=function(canvas, xcoord, ycoord){
 	tmax=document.getElementById('tmax_id').value;
 	ymin=document.getElementById('ymin_id').value;
 	ymax=document.getElementById('ymax_id').value;
-	tO=document.getElementById('tO_id').value;
+	tO=0;
 	arrow=document.getElementById('arrow_id').value;
 	context.strokeStyle="rgba(192, 0, 0, 1)"; // dark red
 	context.fillStyle="rgba(192, 0, 0, 1)"; // dark red
-	linewidth=document.getElementById('linewidth_id').value;
+	linewidth=2;
 	context.lineWidth = linewidth;
 	arrow=document.getElementById('arrow_id').value;
 	var dt;
 	var dT;
 	dT = tmax*0.001-tmin*0.001;
-	tO=document.getElementById('tO_id').value;
+	tO=0;
 	
 	var X, Y, T, prevX, prevY;
 	var dx, dy, tstep;
@@ -693,9 +538,6 @@ var doMouseDown=function(canvas, xcoord, ycoord){
 	var RKY1, RKY2, RKY3, RKY4;
 	
 	T = tO*1.0;
-	setColor(T);
-	// if(document.getElementById("initialPosition").checked)
-	// { context.fillRect(xcoord-2*linewidth,ycoord-2*linewidth,4*linewidth,4*linewidth); }
 	
 	for (i=-1; i <=1; i = i+2){
 		context.beginPath();
@@ -727,7 +569,6 @@ var doMouseDown=function(canvas, xcoord, ycoord){
 			)
 		{
 			tstep = tstep+1;
-			//Runge-Kutta
 			RKX1 = i*xprime(X,Y,T);
 			RKY1 = i*yprime(X,Y,T);
 			dt = dT/(1+Math.sqrt(RKX1*RKX1+RKY1*RKY1));
@@ -741,7 +582,6 @@ var doMouseDown=function(canvas, xcoord, ycoord){
 			dy = (1/6) * dt * (RKY1 + 2*RKY2 + 2*RKY3 + RKY4);
 			prevX=X;
 			prevY=Y;
-			setColor(T);
 			context.beginPath();
 			context.moveTo(x0+X*xscale,y0-Y*yscale);
 			X = X + dx;
@@ -767,26 +607,5 @@ var doMouseDown=function(canvas, xcoord, ycoord){
 
 }
 </script>
-
-<!-- 
-<BR>
-<P><div id='printXPrime'></div></p>
-<P><div id='printYPrime'></div></p>
-
-<script type='text/javascript'>
-function userSubmit() {
-
-var xp=document.getElementById('xprime').value;
-document.getElementById('printXPrime').innerHTML='x-prime: '+xp;
-
-var yp=document.getElementById('yprime').value;
-document.getElementById('printYPrime').innerHTML='y-prime: '+yp;
-}
-</script>
-scp dfield.html hosted.uark.edu:public_html/dfield.html
-scp pplane.html hosted.uark.edu:public_html/pplane.html
- -->
- 
-
 
 </body></html>
